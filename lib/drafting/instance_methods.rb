@@ -9,11 +9,11 @@ module Drafting
     end
 
     def save_draft(user=nil)
-      self.draft ||= Draft.new
+      build_draft unless self.draft.present?
       draft.data = dump_to_draft
       draft.target_type = self.class.name
       draft.user = user
-      draft.parent = self
+      draft.parent = self if self.persisted?
       draft.save
     end
 
