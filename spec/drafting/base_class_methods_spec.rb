@@ -2,36 +2,10 @@ require 'spec_helper'
 
 describe Drafting::BaseClassMethods do
   describe :has_drafts do
-    it "should accept no argument" do
+    it "should not raise error" do
       expect {
-        Post.has_drafts
+        Post.has_draft
       }.to_not raise_error
-    end
-
-    it "should accept :parent key" do
-      expect {
-        Post.has_drafts :parent => :author
-      }.to_not raise_error
-
-      expect(Author.new).to respond_to(:drafts)
-    end
-
-    it "should fail for non-hash argument" do
-      expect {
-        Post.has_drafts(42)
-      }.to raise_error(ArgumentError)
-    end
-
-    it "should fail for invalid hash keys" do
-      expect {
-        Post.has_drafts :bar => 'baz'
-      }.to raise_error(ArgumentError)
-    end
-
-    it "should fail for non-existing parent" do
-      expect {
-        Post.has_drafts :parent => :bar
-      }.to raise_error(ArgumentError)
     end
   end
 end

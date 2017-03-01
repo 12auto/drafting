@@ -5,7 +5,7 @@ class Message < ActiveRecord::Base
   has_many :tags, :as => :taggable
 
   attr_accessor :priority
-  has_drafts :parent => :topic
+  has_draft
 
   validates_presence_of :topic_id, :user_id, :content
 end

@@ -1,18 +1,20 @@
 module Drafting
   module InstanceMethods
+    def has_draft?
+      self.draft.present?
+    end
+
+    def has_another_draft?
+      self.has_draft? && !self.from_draft
+    end
+
     def save_draft(user=nil)
-      return false unless self.new_record?
-
-      draft = Draft.find_by_id(self.draft_id) || Draft.new
-
+      self.draft ||= Draft.new
       draft.data = dump_to_draft
       draft.target_type = self.class.name
       draft.user = user
-      draft.parent = self.send(self.class.draft_parent) if self.class.draft_parent
-
-      result = draft.save
-      self.draft_id = draft.id if result
-      result
+      draft.parent = self
+      draft.save
     end
 
     def update_draft(user, attributes)
@@ -22,7 +24,7 @@ module Drafting
       end
     end
 
-    # Override this two methods if you want to change the way to dump/load data
+    # Override these two methods if you want to change the way to dump/load data
     def dump_to_draft
       Marshal.dump(instance_values)
     end
@@ -33,14 +35,14 @@ module Drafting
       values.each do |name, value|
         instance_variable_set("@#{name}", value)
       end
+      self.from_draft = true
     end
 
   private
 
     def clear_draft
-      if draft = Draft.find_by_id(self.draft_id)
-        self.draft_id = nil if draft.destroy
-      end
+      self.draft&.destroy
     end
+
   end
 end

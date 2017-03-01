@@ -6,12 +6,12 @@ require 'drafting/version'
 Gem::Specification.new do |spec|
   spec.name          = "drafting"
   spec.version       = Drafting::VERSION
-  spec.authors       = ["Georg Ledermann"]
-  spec.email         = ["mail@georg-ledermann.de"]
+  spec.authors       = ["Bohdan Schepanski", "Georg Ledermann"]
+  spec.email         = ["alfuken@gmail.com", "mail@georg-ledermann.de"]
 
-  spec.summary       = %q{Save draft version of any ActiveRecord object}
+  spec.summary       = %q{Save draft version of literally any ActiveRecord object}
   spec.description   = %q{}
-  spec.homepage      = "https://github.com/ledermann/drafting"
+  spec.homepage      = "https://github.com/alfuken/drafting"
   spec.license       = "MIT"
   spec.required_ruby_version = '>= 2.0.0'
 

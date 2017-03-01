@@ -7,7 +7,7 @@ describe Draft do
 
   describe 'restore' do
     before(:each) { message.save_draft(user) }
-    let(:draft) { Draft.find(message.draft_id) }
+    let(:draft) { Draft.find(message.draft.id) }
 
     it "should build new object with attributes" do
       new_message = draft.restore

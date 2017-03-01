@@ -24,14 +24,14 @@ describe Drafting::ClassMethods do
 
   describe 'from_draft' do
     context 'with parent' do
-      let(:draft_id) { message.save_draft(user); message.draft_id }
+      let(:draft_id) { message.save_draft(user); message.draft.id }
 
       it 'should build new object' do
         new_message = Message.from_draft(draft_id)
 
         expect(new_message).to be_a(Message)
         expect(new_message.new_record?).to eq(true)
-        expect(new_message.draft_id).to eq(draft_id)
+        expect(new_message.draft.id).to eq(draft_id)
 
         expect(new_message.topic_id).to eq(topic.id)
         expect(new_message.content).to eq('foo')
@@ -42,7 +42,7 @@ describe Drafting::ClassMethods do
 
         expect {
           new_message.save!
-          expect(new_message.draft_id).to eq(nil)
+          expect(Draft.find_by(id: new_message.draft.id)).to eq(nil)
         }.to change(Draft, :count).by(-1).and \
              change(Message, :count).by(1)
 
@@ -51,14 +51,14 @@ describe Drafting::ClassMethods do
     end
 
     context 'without parent' do
-      let(:draft_id) { page.save_draft(user); page.draft_id }
+      let(:draft_id) { page.save_draft(user); page.draft.id }
 
       it 'should build new object' do
         new_page = Page.from_draft(draft_id)
 
         expect(new_page).to be_a(Page)
         expect(new_page.new_record?).to eq(true)
-        expect(new_page.draft_id).to eq(draft_id)
+        expect(new_page.draft.id).to eq(draft_id)
 
         expect(new_page.title).to eq('First post')
       end
@@ -69,7 +69,7 @@ describe Drafting::ClassMethods do
 
         expect {
           new_page.save!
-          expect(new_page.draft_id).to eq(nil)
+          expect(Draft.find_by(id: new_page.draft.id)).to eq(nil)
         }.to change(Draft, :count).by(-1).and \
              change(Message, :count).by(0)
 
@@ -87,7 +87,7 @@ describe Drafting::ClassMethods do
       message.save_draft(user)
 
       expect {
-        Page.from_draft(message.draft_id)
+        Page.from_draft(message.draft.id)
       }.to raise_error(ArgumentError)
     end
   end

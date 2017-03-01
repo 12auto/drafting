@@ -32,22 +32,19 @@ describe Drafting::InstanceMethods do
         result = message.save_draft(user)
 
         expect(result).to eq(true)
-        expect(message.draft_id).to be_a(Integer)
+        expect(message.draft.id).to be_a(Integer)
       }.to change(Draft, :count).by(1).and \
            change(Message, :count).by(0)
 
-      draft = Draft.find(message.draft_id)
+      draft = Draft.find(message.draft.id)
       expect(draft.target_type).to eq('Message')
-      expect(draft.parent_id).to eq(topic.id)
-      expect(draft.parent_type).to eq('Topic')
+      expect(draft.parent_id).to eq(nil)
+      expect(draft.parent_type).to eq('Message')
       expect(draft.user_id).to eq(user.id)
       expect(draft.restore.attributes).to eq(message.attributes)
 
-      expect(topic.drafts(user)).to eq([draft])
-      expect(topic.drafts(other_user)).to eq([])
-
-      expect(Topic.child_drafts(user)).to eq([draft])
-      expect(Topic.child_drafts(other_user)).to eq([])
+      expect(Message.drafts(user)).to eq([draft])
+      expect(Message.drafts(other_user)).to eq([])
     end
 
     it 'should store Draft object without user' do
@@ -58,7 +55,7 @@ describe Drafting::InstanceMethods do
       }.to change(Draft, :count).by(1).and \
            change(Message, :count).by(0)
 
-      draft = Draft.find(page.draft_id)
+      draft = Draft.find(page.draft.id)
       expect(draft.user_id).to eq(nil)
     end
 
@@ -66,7 +63,7 @@ describe Drafting::InstanceMethods do
       message.priority = 5
       message.save_draft(user)
 
-      draft = Draft.find(message.draft_id)
+      draft = Draft.find(message.draft.id)
       expect(draft.restore.priority).to eq(5)
     end
 
@@ -76,7 +73,7 @@ describe Drafting::InstanceMethods do
       message.tags.build :name => 'ruby'
       message.save_draft(user)
 
-      draft = Draft.find(message.draft_id)
+      draft = Draft.find(message.draft.id)
       expect(draft.restore.tags.map(&:name)).to eq(%w(important ruby))
     end
 
@@ -89,16 +86,8 @@ describe Drafting::InstanceMethods do
       }.to change(Draft, :count).by(0).and \
            change(Message, :count).by(0)
 
-      draft = Draft.find(message.draft_id)
+      draft = Draft.find(message.draft.id)
       expect(draft.restore.attributes).to eq(message.attributes)
-    end
-
-    it 'should fail after real save' do
-      message.save_draft(user)
-
-      message.save!
-
-      expect(message.save_draft(user)).to eq(false)
     end
   end
 
@@ -111,7 +100,7 @@ describe Drafting::InstanceMethods do
       }.to change(Draft, :count).by(0).and \
            change(Message, :count).by(0)
 
-      draft = Draft.find(message.draft_id)
+      draft = Draft.find(message.draft.id)
       expect(draft.restore.attributes).to eq(message.attributes)
     end
   end
@@ -125,18 +114,18 @@ describe Drafting::InstanceMethods do
       }.to change(Draft, :count).by(-1).and \
            change(Message, :count).by(1)
 
-      expect(message.draft_id).to eq(nil)
+      expect(Draft.find_by(id: message.draft.id)).to eq(nil)
     end
 
     it 'should remove Draft object on later save' do
-      new_message = Message.from_draft(message.draft_id)
+      new_message = Message.from_draft(message.draft.id)
 
       expect {
         new_message.save!
       }.to change(Draft, :count).by(-1).and \
            change(Message, :count).by(1)
 
-      expect(new_message.draft_id).to eq(nil)
+      expect(Draft.find_by(id: new_message.draft.id)).to eq(nil)
     end
   end
 end
