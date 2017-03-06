@@ -13,7 +13,6 @@ module Drafting
       draft.data = dump_to_draft
       draft.target_type = self.class.name
       draft.user = user
-      draft.parent = self if self.persisted?
       draft.save
     end
 
